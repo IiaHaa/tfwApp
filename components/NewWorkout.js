@@ -1,126 +1,123 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Pressable, FlatList } from 'react-native';
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, StyleSheet, TextInput, Pressable, ScrollView } from 'react-native';
 import { Picker as SelectPicker } from '@react-native-picker/picker';
-import { API_URL, API_KEY } from '@env';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { push, ref } from 'firebase/database';
+import database from './database';
 
-export default function NewWorkout() {
+export default function Profile() {
+    const [date, setDate] = useState("");
     const [workout, setWorkout] = useState("");
-    const [workouts, setWorkouts] = useState([]);
-    const [message, setMessage] = useState("");
-    const [type, setType] = useState("");
     const [reps, setReps] = useState("");
     const [weight, setWeight] = useState("");
+    const [message, setMessage] = useState("");
 
-    const listWorkouts = () => {
-        fetch(`${API_URL}${type}`, {
-          headers: {
-            'X-Api-Key': `${API_KEY}`
-          }
-        })
-        .then(response => response.json())
-        .then(responseJson => setWorkouts(responseJson))
-        .catch(error => { 
-            Alert.alert('Error', error.message); 
-        });
-        console.log(workouts);
-        if (workouts.length == 0) {
-            setMessage("Ei pystytty hakemaan treenejä")
-        }
+    const initialFocus = useRef(null);
 
-      }
+    // Save workout
+    const saveWorkout = () => {
+        if (workout == '0' || workout == '') {
+            setMessage("Valitse liike");
+        } else if (reps == "") {
+            setMessage("Merkkaa toistojen määrä");
+        } else {
+            let parts = date.split('.');
+            let newdate = parts[2] + "-" + parts[1] + "-" + parts[0];
+            let isValidDate = Date.parse(newdate);
+                if (isNaN(isValidDate)) {
+                    setMessage("Tarkista, että päivä on oikein (pp.kk.vvvv)");
+                } else {
+            push(
+            ref(database, 'workouts/'),
+            { 'date': newdate, 'workout': workout, 'reps': reps, 'weight': weight});
+            setMessage("Tallennettu!");
 
-    const add = () => {
-        if (type === '0' || type === "") {
-            setMessage("Valitse treenin tyyppi");
-        }
-        else {
-            setMessage("Treeni lisätty!");
-            setWorkout("");
-            setType("");
+
+
+
+
+
+
+
+
+
+
+            setDate("");
+            setWorkout("0");
             setReps("");
             setWeight("");
+            initialFocus.current.focus();
+            }
         }
-    };
+    }
 
     return (
-        <View style={styles.container}>
-            <View style={{ flex:1, marginTop:20 }}>
-                <Text style={styles.text}>Lisää treeni</Text>
+        <ScrollView style={styles.container}>
+            <View style={styles.main}>
+                <View style={{ flex:1, marginTop:20 }}>
+                    <View>
 
-                    <View style={styles.picker}>
-                        <SelectPicker
-                            selectedValue={type}
-                            onValueChange={(itemValue, itemIndex) =>
-                            setType(itemValue)
-                            }>
-                            <SelectPicker.Item label='Select workout type' value='0' />
-                            <SelectPicker.Item label='Biceps' value='biceps' />
-                            <SelectPicker.Item label='Powerlifting' value='powerlifting' />
-                            <SelectPicker.Item label='Strength' value='strength' />
-                        </SelectPicker>
+                        <TextInput  keyboardType='numeric' placeholder='Päivämäärä (pp.kk.vvvv)' ref={initialFocus} style={ styles.input }
+                        onChangeText={(date) => setDate(date)}
+                        value={date}/>
+                        </View>
+                        <View style={styles.picker}>
+                            <SelectPicker
+                                selectedValue={workout}
+                                onValueChange={(itemValue, itemIndex) =>
+                                setWorkout(itemValue)
+                                }>
+                                <SelectPicker.Item label='Valitse liike' value='0' />
+                                <SelectPicker.Item label='Back squat' value='Back squat' />
+                                <SelectPicker.Item label='Bench press' value='Bench press' />
+                                <SelectPicker.Item label='Bent-over row' value='Bent-over row' />
+                                <SelectPicker.Item label='Deadlift' value='Deadlift' />
+                                <SelectPicker.Item label='Front squat' value='Front squat' />
+                                <SelectPicker.Item label='Overhead press' value='Overhead press' />
+                                <SelectPicker.Item label='Pull-up' value='Pull-up' />
+                                <SelectPicker.Item label='Push-ups' value='Push-up' />
+                            </SelectPicker>
+                        </View>
+                        
+                        <View style={{ flexDirection: 'row'}}>
+                            <TextInput keyboardType='numeric' style={styles.input2} placeholder='Toistot (lkm)' onChangeText={reps => setReps(reps)} value={reps} />
+                            <TextInput keyboardType='numeric' style={styles.input2} placeholder='Paino (kg)' onChangeText={weight => setWeight(weight)} value={weight} />
+                        </View>
+                        <View style={{ justifyContent: 'flex-start'}}>
+
+                        <Pressable style={styles.button} onPress={saveWorkout}>
+                            <Text style={styles.buttontext}>Lisää</Text>
+                        </Pressable>
+
+                        <Text style={styles.message}>{message}</Text>
                     </View>
-
-                    <Pressable style={styles.button} onPress={listWorkouts}>
-                        <Text style={styles.buttontext}>Search</Text>
-                    </Pressable>
-
-                    <View style={styles.picker}>
-                        <SelectPicker
-                            selectedValue={workout}
-                            onValueChange={(itemValue, itemIndex) =>
-                            setWorkout(itemValue)
-                        }>
-                            <FlatList 
-                                style={{marginLeft : "5%"}}
-                                keyExtractor={(item, index) => index.toString()} 
-                                renderItem={({item}) => 
-                                    <View>
-                                        <SelectPicker.Item label={item.name} value={item.name} />
-                                    </View>}
-                                data={workouts} 
-                                />
-                        </SelectPicker>
-                    </View>
-                    
-                    <View style={{ flex: 1, flexDirection: 'row'}}>
-                        <TextInput keyboardType='numeric' style={styles.input2} placeholder='Toistot (lkm)' onChangeText={reps => setReps(reps)} value={reps} />
-                        <TextInput keyboardType='numeric' style={styles.input2} placeholder='Paino (kg)' onChangeText={weight => setWeight(weight)} value={weight} />
-                    </View>
-                    <View style={{flex: 2, justifyContent: 'flex-start'}}>
-
-                    <Pressable style={styles.button} onPress={add}>
-                        <Text style={styles.buttontext}>Lisää</Text>
-                    </Pressable>
-
-                    <Text style={styles.message}>{message}</Text>
                 </View>
             </View>
-        </View>
+        </ScrollView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
         flexDirection: 'column',
+        backgroundColor: '#fff'
+    },
+    main: {
         alignItems: 'stretch',
         justifyContent: 'center',
-        paddingLeft: '10%'
+        paddingLeft: '5%'
     },
     title: {
         fontWeight: 'bold',
         fontSize: 20,
         paddingTop: '10%',
-        marginBottom: 10
-    },
-    text: {
-        fontSize: 15,
-        marginBottom: 15
+        marginBottom: 20
     },
     message: {
         fontSize: 18,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        marginTop: 30
     },
     input: {
         width: 250,
@@ -150,11 +147,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         padding: 10,
-        backgroundColor: '#C6B5FF',
+        backgroundColor: '#DE9E36',
         elevation: 3,
         borderRadius: 4,
-        marginTop: 10,
-        marginBottom: 30
+        marginTop: 20
     },
     buttontext: {
         fontSize: 18,

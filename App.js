@@ -1,12 +1,11 @@
 import { NavigationContainer } from'@react-navigation/native';
 import { createBottomTabNavigator } from'@react-navigation/bottom-tabs';
-import { StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import Home from './components/Home';
 import NewWorkout from './components/NewWorkout';
 import Workouts from './components/Workouts';
-import Profile from './components/Profile';
+import Records from './components/Records';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,6 +16,9 @@ export default function App() {
           screenOptions={({ route }) => ({  // Navigator can be customized using screenOptions
             tabBarInactiveTintColor: '#3D3D3D',
             tabBarActiveTintColor: '#DE9E36',
+            headerStyle: {
+              backgroundColor: '#DE9E36',
+            },
             tabBarIcon: ({ focused, color, size }) => {
                 // Function tabBarIcon is given the focused state, color and size params
                 let iconName;
@@ -27,8 +29,8 @@ export default function App() {
                   iconName = 'md-add';
                 } else if (route.name === 'Treenit') {
                   iconName = 'md-bar-chart';
-                } else if (route.name === 'Profiili') {
-                  iconName = 'md-body';
+                } else if (route.name === 'Enkat') {
+                  iconName = 'md-flame';
                 } else {
                   console.error('Unknown route')
                 }
@@ -38,15 +40,9 @@ export default function App() {
           })}>
           <Tab.Screen name="Koti" component={Home} />
           <Tab.Screen name="Uusi treeni" component={NewWorkout} options={{unmountOnBlur: true}} />
-          <Tab.Screen name="Treenit" component={Workouts} />
-          <Tab.Screen name="Profiili" component={Profile} />
+          <Tab.Screen name="Treenit" component={Workouts} options={{unmountOnBlur: true}}/>
+          <Tab.Screen name="Enkat" component={Records} options={{unmountOnBlur: true}}/>
         </Tab.Navigator>
       </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  navigator: {
-    padding: 10
-  },
-});

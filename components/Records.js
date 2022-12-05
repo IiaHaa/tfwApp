@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { ListItem, Icon } from 'react-native-elements';
-import { ref, onValue, remove } from 'firebase/database';
+import { ref, onValue } from 'firebase/database';
 import database from './database';
 
-export default function Workouts() {
+export default function Profile() {
     const [workouts, setWorkouts] = useState([]);
 
     // Realtime update
@@ -18,31 +18,44 @@ export default function Workouts() {
         })
     }, []);
 
-    const sortedWorkouts = workouts.sort(function(a,b){
-        return new Date(b.date) - new Date(a.date);
-    });
 
-    // Delete workout
-    const deleteWorkout = (key) => {
-        remove(ref(database, 'workouts/' + key));
-    }
+    // Records
+    const maxList = {};
+
+    for (let i = 0; i < workouts.length; i++) {
+        let item = workouts[i];
+    
+        if (item.weight == "") {
+            if (maxList[item.workout] == undefined) {
+                maxList[item.workout] = item.reps;
+            } else {
+                if (maxList[item.workout].reps < item.reps) {
+                    maxList[item.workout].reps = item.reps;
+                }
+            }
+        } else {
+            if (maxList[item.workout] == undefined) {
+                maxList[item.workout] = item.weight;
+            }
+        }
+        };
+        console.log(maxList);
 
     return (
         <View style={styles.container}>
             <View style={styles.main}>
               <View style={{ marginBottom: 15 }}>
-                <Text style={styles.title}>Viimeisimmät treenit</Text>
                     <FlatList 
-                        renderItem={({item}) =>
-                        <ListItem bottomDivider>
+                        renderItem={({item}) => 
+                        <ListItem>
                           <ListItem.Content>
-                            <ListItem.Subtitle style={{ fontStyle: 'italic', marginBottom: 3}}>{item.date}</ListItem.Subtitle>
-                            <ListItem.Title>{ item.weight == "" ?  <Text style={{fontSize: 18}}>{item.workout}, {item.reps} toistoa</Text> : <Text style={{fontSize: 18}}>{item.workout}, {item.reps} x {item.weight} kg</Text> }</ListItem.Title>
+                            <Icon type="material" name="star" iconStyle="sharp" color="#DE9E36"/>
+                            <ListItem.Title><Text style={{fontSize: 18}}>{item.key} {item.value}</Text></ListItem.Title>
+                            <ListItem.Subtitle style={{ fontStyle: 'italic', marginBottom: 3}}>Teksti</ListItem.Subtitle>
                           </ListItem.Content>
-                          <Icon type="material" name="delete" iconStyle="sharp" color="#DE9E36" onPress={() => deleteWorkout(item.key)} />
                         </ListItem>
                         }
-                        data={sortedWorkouts}
+                        data={maxList}
                     />
                 </View>
             </View>
@@ -59,14 +72,7 @@ const styles = StyleSheet.create({
     main: {
         alignItems: 'stretch',
         justifyContent: 'center',
-        paddingLeft: '5%',
-        paddingBottom: '10%',
-        paddingTop: '10%'
-    },
-    title: {
-        fontWeight: 'bold',
-        fontSize: 20,
-        marginBottom: 20
+        paddingLeft: '5%'
     },
     text: {
         fontSize: 15,
