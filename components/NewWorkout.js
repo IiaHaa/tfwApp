@@ -1,18 +1,39 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, Button } from 'react-native';
 import { Picker as SelectPicker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { push, ref } from 'firebase/database';
 import database from './database';
 
 export default function Profile() {
-    const [date, setDate] = useState("");
+    const [date, setDate] = useState(new Date(1598051730000));
+    const [mode, setMode] = useState('date');
+    const [show, setShow] = useState(false);
+
     const [workout, setWorkout] = useState("");
     const [reps, setReps] = useState("");
     const [weight, setWeight] = useState("");
     const [message, setMessage] = useState("");
 
     const initialFocus = useRef(null);
+
+    const onChange = (event, selectedDate) => {
+        const currentDate = selectedDate;
+        setShow(false);
+        setDate(currentDate);
+      };
+    
+      const showMode = (currentMode) => {
+        if (Platform.OS === 'android') {
+          setShow(false);
+          // for iOS, add a button that closes the picker
+        }
+        setMode(currentMode);
+      };
+    
+      const showDatepicker = () => {
+        showMode('date');
+      };
 
     // Save workout
     const saveWorkout = () => {
@@ -31,17 +52,6 @@ export default function Profile() {
             ref(database, 'workouts/'),
             { 'date': newdate, 'workout': workout, 'reps': reps, 'weight': weight});
             setMessage("Tallennettu!");
-
-
-
-
-
-
-
-
-
-
-
             setDate("");
             setWorkout("0");
             setReps("");
@@ -56,11 +66,15 @@ export default function Profile() {
             <View style={styles.main}>
                 <View style={{ flex:1, marginTop:20 }}>
                     <View>
-
-                        <TextInput  keyboardType='numeric' placeholder='Päivämäärä (pp.kk.vvvv)' ref={initialFocus} style={ styles.input }
-                        onChangeText={(date) => setDate(date)}
-                        value={date}/>
-                        </View>
+                    <Button onPress={showDatepicker} title="Show date picker!" />
+                    <Text>selected: {date.toLocaleString()}</Text>
+                    {show && (
+                        <DateTimePicker
+                        value={date}
+                        onChange={onChange}
+                        />
+                    )}
+                    </View>
                         <View style={styles.picker}>
                             <SelectPicker
                                 selectedValue={workout}
@@ -75,7 +89,7 @@ export default function Profile() {
                                 <SelectPicker.Item label='Front squat' value='Front squat' />
                                 <SelectPicker.Item label='Overhead press' value='Overhead press' />
                                 <SelectPicker.Item label='Pull-up' value='Pull-up' />
-                                <SelectPicker.Item label='Push-ups' value='Push-up' />
+                                <SelectPicker.Item label='Push-up' value='Push-up' />
                             </SelectPicker>
                         </View>
                         

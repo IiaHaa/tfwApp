@@ -6,6 +6,7 @@ import database from './database';
 
 export default function Workouts() {
     const [workouts, setWorkouts] = useState([]);
+    const [message, setMessage] = useState("");
 
     // Realtime update
     useEffect(() => {
@@ -27,6 +28,14 @@ export default function Workouts() {
         remove(ref(database, 'workouts/' + key));
     }
 
+    useEffect(() => {
+        if (workouts.length == 0) {
+            setMessage("Ei vielä lisättyjä treenejä");
+        } else {
+            setMessage("");
+        }
+    });
+
     return (
         <View style={styles.container}>
             <View style={styles.main}>
@@ -45,6 +54,7 @@ export default function Workouts() {
                         data={sortedWorkouts}
                     />
                 </View>
+                <Text style={styles.message}>{message}</Text>
             </View>
         </View>
     )
@@ -72,4 +82,8 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginBottom: 15
     },
+    message: {
+        fontSize: 18,
+        marginTop: 30
+    }
   });

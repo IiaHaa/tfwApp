@@ -6,6 +6,8 @@ import database from './database';
 
 export default function Profile() {
     const [workouts, setWorkouts] = useState([]);
+    const [message, setMessage] = useState("");
+    const list = [];
 
     // Realtime update
     useEffect(() => {
@@ -18,13 +20,12 @@ export default function Profile() {
         })
     }, []);
 
-
     // Records
     const maxList = {};
 
     for (let i = 0; i < workouts.length; i++) {
         let item = workouts[i];
-    
+        
         if (item.weight == "") {
             if (maxList[item.workout] == undefined) {
                 maxList[item.workout] = item.reps;
@@ -38,26 +39,38 @@ export default function Profile() {
                 maxList[item.workout] = item.weight;
             }
         }
-        };
-        console.log(maxList);
+    };
+
+    console.log(maxList);
+
+    for (const [key, value] of Object.entries(maxList)) {
+        list.push(`${key}: ${value}`);
+    }
+
+    useEffect(() => {
+        if (list.length == 0) {
+            setMessage("Ei vielä ennätyksiä");
+        } else {
+            setMessage("");
+        }
+    });
 
     return (
         <View style={styles.container}>
             <View style={styles.main}>
-              <View style={{ marginBottom: 15 }}>
+                <View style={{ marginBottom: 15 }}>
                     <FlatList 
-                        renderItem={({item}) => 
-                        <ListItem>
-                          <ListItem.Content>
-                            <Icon type="material" name="star" iconStyle="sharp" color="#DE9E36"/>
-                            <ListItem.Title><Text style={{fontSize: 18}}>{item.key} {item.value}</Text></ListItem.Title>
-                            <ListItem.Subtitle style={{ fontStyle: 'italic', marginBottom: 3}}>Teksti</ListItem.Subtitle>
-                          </ListItem.Content>
+                        renderItem={({item}) =>
+                        <ListItem bottomDivider>
+                            <ListItem.Content>
+                                <ListItem.Title><Text style={{fontSize: 18}}> {item}</Text></ListItem.Title>
+                            </ListItem.Content>
                         </ListItem>
                         }
-                        data={maxList}
+                        data={list}
                     />
                 </View>
+                <Text style={styles.message}>{message}</Text>
             </View>
         </View>
     )
@@ -78,4 +91,8 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginBottom: 15
     },
+    message: {
+        fontSize: 18,
+        marginTop: 30
+    }
   });
