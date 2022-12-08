@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, Button } from 'react-native';
 import { Picker as SelectPicker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -9,13 +9,10 @@ export default function Profile() {
     const [date, setDate] = useState(new Date(1598051730000));
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
-
     const [workout, setWorkout] = useState("");
     const [reps, setReps] = useState("");
     const [weight, setWeight] = useState("");
     const [message, setMessage] = useState("");
-
-    const initialFocus = useRef(null);
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate;
@@ -42,24 +39,16 @@ export default function Profile() {
         } else if (reps == "") {
             setMessage("Merkkaa toistojen määrä");
         } else {
-            let parts = date.split('.');
-            let newdate = parts[2] + "-" + parts[1] + "-" + parts[0];
-            let isValidDate = Date.parse(newdate);
-                if (isNaN(isValidDate)) {
-                    setMessage("Tarkista, että päivä on oikein (pp.kk.vvvv)");
-                } else {
             push(
             ref(database, 'workouts/'),
-            { 'date': newdate, 'workout': workout, 'reps': reps, 'weight': weight});
+            { 'date': date, 'workout': workout, 'reps': reps, 'weight': weight});
             setMessage("Tallennettu!");
             setDate("");
             setWorkout("0");
             setReps("");
             setWeight("");
-            initialFocus.current.focus();
             }
         }
-    }
 
     return (
         <ScrollView style={styles.container}>
@@ -71,6 +60,7 @@ export default function Profile() {
                     {show && (
                         <DateTimePicker
                         value={date}
+                        mode={mode}
                         onChange={onChange}
                         />
                     )}
