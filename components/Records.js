@@ -20,6 +20,7 @@ export default function Profile() {
         })
     }, []);
 
+    console.log(workouts);
     // Records
     const maxList = {};
 
@@ -30,13 +31,17 @@ export default function Profile() {
             if (maxList[item.workout] == undefined) {
                 maxList[item.workout] = item.reps;
             } else {
-                if (maxList[item.workout].reps < item.reps) {
-                    maxList[item.workout].reps = item.reps;
+                if (maxList[item.workout] < item.reps) {
+                    maxList[item.workout] = item.reps;
                 }
             }
-        } else {
+        } else if (item.reps == "1") {
             if (maxList[item.workout] == undefined) {
                 maxList[item.workout] = item.weight;
+            } else {
+                if (maxList[item.workout] < item.weight) {
+                    maxList[item.workout] = item.weight;
+                }
             }
         }
     };
@@ -51,6 +56,7 @@ export default function Profile() {
         if (list.length == 0) {
             setMessage("Ei vielä ennätyksiä");
         } else {
+            list.sort();
             setMessage("");
         }
     });
@@ -63,7 +69,7 @@ export default function Profile() {
                         renderItem={({item}) =>
                         <ListItem bottomDivider>
                             <ListItem.Content>
-                                <ListItem.Title><Text style={{fontSize: 18}}> {item}</Text></ListItem.Title>
+                                <ListItem.Title><Icon type="material" name="star" iconStyle="sharp" color="#DE9E36" /><Text style={{fontSize: 18}}> {item}</Text></ListItem.Title>
                             </ListItem.Content>
                         </ListItem>
                         }

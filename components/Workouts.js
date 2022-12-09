@@ -19,10 +19,6 @@ export default function Workouts() {
         })
     }, []);
 
-    const sortedWorkouts = workouts.sort(function(a,b){
-        return new Date(b.date) - new Date(a.date);
-    });
-
     // Delete workout
     const deleteWorkout = (key) => {
         remove(ref(database, 'workouts/' + key));
@@ -40,7 +36,6 @@ export default function Workouts() {
         <View style={styles.container}>
             <View style={styles.main}>
               <View style={{ marginBottom: 15 }}>
-                <Text style={styles.title}>Viimeisimmät treenit</Text>
                     <FlatList 
                         renderItem={({item}) =>
                         <ListItem bottomDivider>
@@ -51,7 +46,7 @@ export default function Workouts() {
                           <Icon type="material" name="delete" iconStyle="sharp" color="#DE9E36" onPress={() => deleteWorkout(item.key)} />
                         </ListItem>
                         }
-                        data={sortedWorkouts}
+                        data={workouts}
                     />
                 </View>
                 <Text style={styles.message}>{message}</Text>
@@ -70,13 +65,7 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         justifyContent: 'center',
         paddingLeft: '5%',
-        paddingBottom: '10%',
         paddingTop: '10%'
-    },
-    title: {
-        fontWeight: 'bold',
-        fontSize: 20,
-        marginBottom: 20
     },
     text: {
         fontSize: 15,
