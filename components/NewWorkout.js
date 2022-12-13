@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, Button } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, Image } from 'react-native';
 import { Picker as SelectPicker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { push, ref } from 'firebase/database';
@@ -18,6 +18,7 @@ export default function Profile() {
         dateFormat();
     })
 
+    // Date picker
     const dateFormat = () => {
     var strdate = date.toISOString();
     strdate = strdate.toString();
@@ -36,8 +37,6 @@ export default function Profile() {
         dateFormat();
     };
     
-
-    
     const showDatepicker = () => {
         setShow(true);
         setMessage("");
@@ -50,9 +49,17 @@ export default function Profile() {
         } else if (reps == "") {
             setMessage("Merkkaa toistojen määrä");
         } else {
+            let reps2 = reps;
+            let weight2 = weight;
+            if (reps != 0) {
+                reps2 = parseInt(reps);
+            }
+            if (weight != 0) {
+                weight2 = parseFloat(weight.replace(',', '.'));
+            }
             push(
             ref(database, 'workouts/'),
-            { 'date': dateString, 'workout': workout, 'reps': reps, 'weight': weight});
+            { 'date': dateString, 'workout': workout, 'reps': reps2, 'weight': weight2});
             setMessage("Tallennettu!");
             setDate(new Date());
             setWorkout("0");
@@ -62,7 +69,7 @@ export default function Profile() {
     }
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={styles.container} keyboardShouldPersistTaps={'handled'}>
             <View style={styles.main}>
                 <View style={{ flex:1, marginTop:20 }}>
                     <Pressable style={styles.datebutton} onPress={showDatepicker}>
@@ -96,8 +103,8 @@ export default function Profile() {
                     </View>
                         
                     <View style={{ flexDirection: 'row'}}>
-                        <TextInput keyboardType='numeric' style={styles.input2} placeholder='Toistot (lkm)' onChangeText={reps => setReps(reps)} value={reps} />
                         <TextInput keyboardType='numeric' style={styles.input2} placeholder='Paino (kg)' onChangeText={weight => setWeight(weight)} value={weight} />
+                        <TextInput keyboardType='numeric' style={styles.input2} placeholder='Toistot (lkm)' onChangeText={reps => setReps(reps)} value={reps} />
                     </View>
 
                     <View style={{ justifyContent: 'flex-start'}}>
@@ -106,7 +113,9 @@ export default function Profile() {
                         </Pressable>
                         <Text style={styles.message}>{message}</Text>
                     </View>
-
+                </View>
+                <View style={styles.imagecontainer}>
+                    <Image style={ styles.image } source={require('./workout.png')}/>
                 </View>
             </View>
         </ScrollView>
@@ -169,7 +178,7 @@ const styles = StyleSheet.create({
         marginTop: 20
     },
     datebutton: {
-        width: 200,
+        width: 190,
         alignItems: 'center',
         justifyContent: 'center',
         padding: 10,
@@ -181,11 +190,18 @@ const styles = StyleSheet.create({
     datetext: {
         fontSize: 18,
         marginTop: 10,
-        marginBottom: 10
+        marginBottom: 8
     },
     buttontext: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#FFFFFF'
+    },
+    imagecontainer: {
+        flex: 1,
+        flexDirection: 'row'
+    },
+    image: {
+        marginLeft: '10%'
     }
   });

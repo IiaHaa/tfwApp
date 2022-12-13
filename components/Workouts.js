@@ -19,11 +19,6 @@ export default function Workouts() {
         })
     }, []);
 
-    // Delete workout
-    const deleteWorkout = (key) => {
-        remove(ref(database, 'workouts/' + key));
-    }
-
     useEffect(() => {
         if (workouts.length == 0) {
             setMessage("Ei vielä lisättyjä treenejä");
@@ -31,6 +26,26 @@ export default function Workouts() {
             setMessage("");
         }
     });
+
+    // Delete workout
+    const deleteWorkout = (key) => {
+        remove(ref(database, 'workouts/' + key));
+    }
+
+    // Adding date object to array
+    for (let i = 0; i < workouts.length; i++) {
+        let item = workouts[i];
+    
+        let dateFormat = item.date.split(".");
+        let d = dateFormat[0];
+        let m = dateFormat[1] -1;
+        let y = dateFormat[2];
+        dateFormat = new Date(y, m, d);
+        item["dateArray"] = dateFormat;
+    };
+
+    // Sort workouts by date
+    const sortedWorkouts = workouts.sort((a, b) => (a.dateArray < b.dateArray) ? 1 : -1);
 
     return (
         <View style={styles.container}>
@@ -46,7 +61,7 @@ export default function Workouts() {
                           <Icon type="material" name="delete" iconStyle="sharp" color="#DE9E36" onPress={() => deleteWorkout(item.key)} />
                         </ListItem>
                         }
-                        data={workouts}
+                        data={sortedWorkouts}
                     />
                 </View>
                 <Text style={styles.message}>{message}</Text>

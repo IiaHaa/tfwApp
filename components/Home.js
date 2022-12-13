@@ -5,6 +5,9 @@ import database from './database';
 
 export default function Home() {
     const [workouts, setWorkouts] = useState([]);
+    const [date, setDate] = useState('Etsitään päivämäärää...');
+    const [liike, setLiike] = useState('Etsitään liikkeitä...');
+
     // Realtime update
     useEffect(() => {
         const itemsRef = ref(database, 'workouts/');
@@ -16,9 +19,7 @@ export default function Home() {
         })
     }, []);
 
-    const [date, setDate] = useState('Etsitään päivämäärää...');
-    const [liike, setLiike] = useState('Etsitään liikkeitä...');
-
+    // Stating current month's primary movement
     useEffect(() => {
         const kuukaudet = ['Kuukauden', 'Tammikuun', 'Helmikuun', 'Maaliskuun', 'Huhtikuun', 'Toukokuun', 'Kesäkuun', 'Heinäkuun', 'Elokuun', 'Syyskuun', 'Lokakuun', 'Marraskuun', 'Joulukuun']
         const liikkeet = ['Pääliikkeet', 'OH Press & Deadlift', 'Bench Press & Back Squat', 'Pull-up & Front Squat', 'OH Press & Deadlift', 'Bench Press & Back Squat', 'Pull-up & Front Squat', '', 'Bench Press & Back Squat', 'Pull-up & Front Squat', 'OH Press & Deadlift', 'Bench Press & Back Squat', 'Pull-up & Front Squat']

@@ -39,8 +39,8 @@ export default function App() {
           })}>
           <Tab.Screen name="Koti" component={Home} />
           <Tab.Screen name="Uusi treeni" component={NewWorkout} options={{unmountOnBlur: true}} />
-          <Tab.Screen name="Treenit" component={Workouts} options={{unmountOnBlur: true}}/>
-          <Tab.Screen name="Enkat" component={Records} options={{unmountOnBlur: true}}/>
+          <Tab.Screen name="Treenit" component={Workouts}/>
+          <Tab.Screen name="Enkat" component={Records}/>
         </Tab.Navigator>
       </NavigationContainer>
   );
